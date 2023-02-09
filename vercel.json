@@ -1,0 +1,19 @@
+{
+	"routes": [
+		{
+			"src": "/",
+			"methods": ["POST"],
+			"dest": "/api/line"
+		},
+		{
+			"src": "/line",
+			"methods": ["POST"],
+			"dest": "/api/line"
+		},
+		{
+			"src": "/instagram",
+			"methods": ["POST"],
+			"dest": "/api/instagram"
+		}
+	]
+}
