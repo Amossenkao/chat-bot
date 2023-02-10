@@ -69,16 +69,14 @@ class Bot {
 		if (event.type !== 'message' || event.message.type !== 'text') {
 			return Promise.resolve(null);
 		}
-		let responseEvent;
 		const userPrompt = event.message.text?.toLowerCase();
-
-		this.getUserInfo(event).then((userName) => {
-			this.fetchAiResponse(userName, userPrompt).then((responseText) => {
-				responseEvent = this.sendReply(event, userPrompt, responseText);
+		return new Promise((resolve, reject) => {
+			this.getUserInfo(event).then((userName) => {
+				this.fetchAiResponse(userName, userPrompt).then((responseText) => {
+					resolve(this.sendReply(event, userPrompt, responseText));
+				});
 			});
 		});
-
-		return responseEvent;
 	};
 }
 
