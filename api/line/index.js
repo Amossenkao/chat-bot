@@ -6,10 +6,7 @@ const lineConfig = {
 	channelAccessToken: env.CHANNEL_ACCESS_TOKEN,
 	channelSecret: env.CHANNEL_SECRET,
 };
-let count = 0;
-setInterval(() => {
-	console.log(++count);
-}, 1000);
+
 module.exports = (req, res) => {
 	let bot = new Bot(req, res, lineConfig);
 	Promise.all(req.body.events.map(bot.handleIncomingEvents))
