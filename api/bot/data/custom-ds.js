@@ -79,10 +79,10 @@ class UsersList {
 		return this;
 	}
 
-	updateConversation(conversation) {
+	async updateConversation(conversation) {
 		let pastConversations = this.getCurrentUser().pastConversations;
 		pastConversations.push(conversation);
-		this.updateDatabase();
+		await this.updateDatabase();
 		return this;
 	}
 
