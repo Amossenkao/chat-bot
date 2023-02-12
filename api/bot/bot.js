@@ -16,7 +16,8 @@ class Bot {
 		this.lineClient = new line.Client(lineConfig);
 	}
 	// Get the user name and user Id from the webhook object
-	getUserInfo = (event) => {
+	getUserInfo = async (event) => {
+		await users.init();
 		return new Promise((resolve, reject) => {
 			this.userId = event.source.userId;
 			const { userId } = this;
