@@ -144,11 +144,4 @@ class UsersList {
 	}
 }
 
-(async () => {
-	const u = new UsersList();
-	await u.init();
-	u.clearUsersList();
-	console.log(u);
-})();
-
 module.exports = { ConversationStack, UsersList };
