@@ -1,50 +1,20 @@
-class CustomArray extends Array {
-	constructor() {
-		if (arguments.length < 2) {
-			super(...arguments, null);
-			super.pop();
-		} else super(...arguments);
+const { ObjectId } = require('mongodb');
+
+class ConversationStack {
+	constructor(conversation) {
+		this.items = conversation?.items ?? [];
+		this.size = conversation?.size ?? 0;
 	}
 
-	countOf(item) {
-		let count = 0;
-		for (let element of this) {
-			if (element === item) count++;
-		}
-		return count;
-	}
-
-	some(predicate, minimun = 1) {
-		let passed = 0;
-		let index = 0;
-		for (let element of this) {
-			if (predicate(element, index++, this)) passed++;
-			if (passed >= minimun) return true;
-		}
-		return false;
-	}
-}
-
-class ConversationQueue {
-	constructor() {
-		this.items = new CustomArray();
-		this.size = 0;
-	}
-
-	enqueue(...items) {
+	push(...items) {
 		this.items.push(...items);
 		this.size += items.length;
 		return this;
 	}
 
-	dequeue() {
+	pop() {
 		this.size--;
-		return this.items.shift();
-	}
-
-	slide(...items) {
-		this.dequeue();
-		return this.enqueue(...items);
+		return this.items.pop();
 	}
 
 	isEmpty() {
@@ -52,11 +22,11 @@ class ConversationQueue {
 	}
 
 	peek() {
-		return this.items[0];
+		return this.items[this.size - 1];
 	}
 
 	clear() {
-		this.items = new CustomArray();
+		this.items = [];
 		this.size = 0;
 		return this;
 	}
@@ -67,7 +37,7 @@ class UserNode {
 		this.data = {
 			userName: userName || null,
 			userId: userId || null,
-			pastConversations: new ConversationQueue(),
+			pastConversations: new ConversationStack(),
 		};
 		this.next = next ?? null;
 	}
@@ -79,8 +49,19 @@ class UsersList {
 		this.userCount = 0;
 		this.currentUserId = currentUserId;
 	}
+	async init() {
+		const collection = await require('../database/db')();
+		const usersObject = await collection.findOne();
+		if (!usersObject) collection.insertOne(this);
+		else {
+			this.head = await usersObject.head;
+			this.userCount = usersObject.userCount;
+			this.currentUserId = usersObject.currentUserId;
+		}
+		return this;
+	}
 
-	addUser(userName, userId) {
+	async addUser(userName, userId) {
 		if (this.getUserById(userId)) {
 			this.currentUserId = userId;
 			return this;
@@ -94,17 +75,24 @@ class UsersList {
 		}
 		this.currentUserId = userId;
 		this.userCount++;
+		this.updateDatabase();
 		return this;
 	}
 
 	updateConversation(conversation) {
 		let pastConversations = this.getCurrentUser().pastConversations;
-		if (pastConversations.size < 10) {
-			pastConversations.enqueue(conversation);
-		} else {
-			pastConversations.slide(conversation);
-		}
+		pastConversations.push(conversation);
+		this.updateDatabase();
 		return this;
+	}
+
+	async updateDatabase() {
+		require('../database/db')().then((users) => {
+			users.findOneAndReplace(
+				{ _id: new ObjectId('63e8c2a158242da2b4e86f96') },
+				this
+			);
+		});
 	}
 
 	getUserById(userId) {
@@ -114,21 +102,26 @@ class UsersList {
 	}
 
 	getCurrentUser() {
-		return this.getUserById(this.currentUserId);
+		const user = this.getUserById(this.currentUserId);
+		user.pastConversations = new ConversationStack(user.pastConversations);
+		return user;
 	}
 
 	getUerConversations() {
-		return this.getCurrentUser().pastConversations.items;
+		return this.getCurrentUser().pastConversations.items.slice(-10);
 	}
 
-	clearUsersList() {
+	async clearUsersList() {
 		this.head = null;
-		this.size = 0;
+		this.userCount = 0;
+		this.currentUserId = null;
+		await this.updateDatabase();
 		return this;
 	}
 
 	clearUserConversations() {
 		this.getCurrentUser().pastConversations.clear();
+		this.updateDatabase();
 	}
 
 	printUsersData() {
@@ -151,4 +144,4 @@ class UsersList {
 	}
 }
 
-module.exports = { ConversationQueue, UsersList };
+module.exports = { ConversationStack, UsersList };
