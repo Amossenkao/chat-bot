@@ -33,7 +33,7 @@ class Bot {
 	// Make a request to the openai api
 	fetchAiResponse = async (userName, userPrompt) => {
 		if (/delete/gi.test(userPrompt)) {
-			await users.clearUserConversations();
+			users.clearUserConversations();
 			return 'past conversations has been deleted...';
 		}
 		await users.updateConversation(`${userName}: ${userPrompt.trim()}`);
@@ -43,7 +43,7 @@ class Bot {
 				prompt(userName, userPrompt, users.getUerConversations())
 			);
 			console.log(response.data.usage);
-			response.data.choices[0].text;
+			return response.data.choices[0].text;
 		} catch (error) {
 			console.log(error);
 			return error;
