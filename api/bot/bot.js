@@ -35,7 +35,7 @@ class Bot {
 	fetchAiResponse = async (userName, userPrompt) => {
 		if (/delete/gi.test(userPrompt)) {
 			await users.clearUserConversations();
-			await users.clearUsersList();
+			// await users.clearUsersList();
 			return 'past conversations has been deleted...';
 		}
 		await users.updateConversation(`${userName}: ${userPrompt.trim()}`);
