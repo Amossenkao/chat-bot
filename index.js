@@ -7,6 +7,7 @@ const PORT = process.env.PORT || 8080;
 const app = express();
 app.use(express.json());
 app.use('/api', api).get('/', (req, res) => {
+	conso.log(ip.address())
 	res.status(404).send(`This probably isn't what you're looking for...`);
 });
 
