@@ -68,10 +68,14 @@ class Bot {
 	handleIncomingEvents = async (event) => {
 		if (event.type !== 'message' || event.message.type !== 'text') return null;
 		const userPrompt = event.message.text?.toLowerCase();
-		const userName = await this.getUserInfo(event);
-		const responseText = await this.fetchAiResponse(userName, userPrompt);
-		const output = await this.sendReply(event, userPrompt, responseText);
-		return output;
+		try {
+			const userName = await this.getUserInfo(event);
+			const responseText = await this.fetchAiResponse(userName, userPrompt);
+			const output = await this.sendReply(event, userPrompt, responseText);
+			return output;
+		} catch (error) {
+			return error;
+		}
 	};
 }
 
