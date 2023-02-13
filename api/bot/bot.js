@@ -57,7 +57,7 @@ class Bot {
 		responseText = responseText?.trim();
 		const replyObject = { type: 'text', text: responseText };
 		if (!userPrompt.includes('delete')) {
-			users.updateConversation(`Tomodachi: ${responseText}`);
+			await users.updateConversation(`Tomodachi: ${responseText}`);
 		}
 		const reply = await this.lineClient.replyMessage(
 			event.replyToken,
