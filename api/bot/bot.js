@@ -43,7 +43,7 @@ class Bot {
 				prompt(userName, userPrompt, users.getUerConversations())
 			);
 			console.log(response.data.usage);
-			response.data.choices[0].text;
+			return response.data.choices[0].text;
 		} catch (error) {
 			console.log(error);
 			return error;
