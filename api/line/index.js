@@ -7,7 +7,7 @@ const lineConfig = {
 	channelSecret: env.CHANNEL_SECRET,
 };
 
-module.exports = (req, res) => {
+module.exports = async (req, res) => {
 	let bot = new Bot(req, res, lineConfig);
 	Promise.all(req.body.events.map(bot.handleIncomingEvents))
 		.then((response) => {

@@ -33,7 +33,8 @@ class Bot {
 	// Make a request to the openai api
 	fetchAiResponse = async (userName, userPrompt) => {
 		if (/delete/gi.test(userPrompt)) {
-			users.clearUserConversations();
+			await users.clearUserConversations();
+			// await users.clearUsersList();
 			return 'past conversations has been deleted...';
 		}
 		await users.updateConversation(`${userName}: ${userPrompt.trim()}`);
@@ -66,12 +67,18 @@ class Bot {
 
 	//  Finally, this function calls all the other functions according to the logical flow
 	handleIncomingEvents = async (event) => {
-		if (event.type !== 'message' || event.message.type !== 'text') return null;
+		if (event.type !== 'message' || event.message.type !== 'text') {
+			return null;
+		}
 		const userPrompt = event.message.text?.toLowerCase();
-		const userName = await this.getUserInfo(event);
-		const responseText = await this.fetchAiResponse(userName, userPrompt);
-		const output = await this.sendReply(event, userPrompt, responseText);
-		return output;
+		try {
+			const userName = await this.getUserInfo(event);
+			const responseText = await this.fetchAiResponse(userName, userPrompt);
+			const output = await this.sendReply(event, userPrompt, responseText);
+			return output;
+		} catch (error) {
+			return error;
+		}
 	};
 }
 
