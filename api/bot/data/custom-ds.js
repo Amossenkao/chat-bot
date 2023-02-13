@@ -62,9 +62,7 @@ class UsersList {
 	}
 
 	async addUser(userName, userId) {
-		const user = this.getUserById(userId);
-		if (user) {
-			user.userName = userName;
+		if (this.getUserById(userId)) {
 			this.currentUserId = userId;
 			return this;
 		}
