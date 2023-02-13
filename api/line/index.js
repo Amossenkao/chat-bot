@@ -12,7 +12,7 @@ lineBot.post('/', async (req, res) => {
 	try {
 		const result = await req.body.events.map(bot.handleIncomingEvents);
 		console.log('Got result from the line/index.jsf file', result);
-		res.json(result);
+		Promise.all(result).then((response) => res.json(response));
 	} catch (error) {
 		console.log('Got error from the line/index.js file');
 		res.sendStatus(503);
