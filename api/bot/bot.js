@@ -16,67 +16,62 @@ class Bot {
 		this.lineClient = new line.Client(lineConfig);
 	}
 	// Get the user name and user Id from the webhook object
-	getUserInfo = (event) => {
-		return new Promise((resolve, reject) => {
-			this.userId = event.source.userId;
-			const { userId } = this;
-			this.lineClient
-				.getProfile(userId)
-				.then((profile) => {
-					users.addUser(profile.displayName, userId);
-					resolve(profile.displayName);
-				})
-				.catch((error) => {
-					reject(error);
-					console.error('Cannot retrieve user info', error);
-				});
-		});
+	getUserInfo = async (event) => {
+		await users.init();
+		this.userId = event.source.userId;
+		const { userId } = this;
+		try {
+			const profile = await this.lineClient.getProfile(userId);
+			await users.addUser(profile.displayName, userId);
+			return profile.displayName;
+		} catch (error) {
+			console.log(error);
+			return error;
+		}
 	};
 
 	// Make a request to the openai api
-	fetchAiResponse = (userName, userPrompt) => {
+	fetchAiResponse = async (userName, userPrompt) => {
 		if (/delete/gi.test(userPrompt)) {
-			users.clearUserConversations();
-			return Promise.resolve('past conversations has been deleted...');
+			await users.clearUserConversations();
+			return 'past conversations has been deleted...';
 		}
-		users.updateConversation(`${userName}: ${userPrompt.trim()} `);
-		return new Promise((resolve, reject) => {
-			openai
-				.createCompletion(
-					prompt(userName, userPrompt, users.getUerConversations())
-				)
-				.then((response) => {
-					console.log(response.data.usage);
-					resolve(response.data.choices[0].text);
-				})
-				.catch((error) => reject(error));
-		});
+		await users.updateConversation(`${userName}: ${userPrompt.trim()}`);
+
+		try {
+			const response = await openai.createCompletion(
+				prompt(userName, userPrompt, users.getUerConversations())
+			);
+			console.log(response.data.usage);
+			response.data.choices[0].text;
+		} catch (error) {
+			console.log(error);
+			return error;
+		}
 	};
 
 	// Make a request to the line api to reply to the message
-	sendReply = (event, userPrompt, responseText) => {
+	sendReply = async (event, userPrompt, responseText) => {
 		responseText = responseText?.trim();
 		const replyObject = { type: 'text', text: responseText };
 		if (!userPrompt.includes('delete')) {
-			users.updateConversation(`Tomodachi: ${responseText} `);
+			users.updateConversation(`Tomodachi: ${responseText}`);
 		}
-
-		return this.lineClient.replyMessage(event.replyToken, replyObject);
+		const reply = await this.lineClient.replyMessage(
+			event.replyToken,
+			replyObject
+		);
+		return reply;
 	};
 
-	//  Finally, this function all the other functions according to the logical flow
-	handleIncomingEvents = (event) => {
-		if (event.type !== 'message' || event.message.type !== 'text') {
-			return Promise.resolve(null);
-		}
+	//  Finally, this function calls all the other functions according to the logical flow
+	handleIncomingEvents = async (event) => {
+		if (event.type !== 'message' || event.message.type !== 'text') return null;
 		const userPrompt = event.message.text?.toLowerCase();
-		return new Promise((resolve, reject) => {
-			this.getUserInfo(event).then((userName) => {
-				this.fetchAiResponse(userName, userPrompt).then((responseText) => {
-					resolve(this.sendReply(event, userPrompt, responseText));
-				});
-			});
-		});
+		const userName = await this.getUserInfo(event);
+		const responseText = await this.fetchAiResponse(userName, userPrompt);
+		const output = await this.sendReply(event, userPrompt, responseText);
+		return output;
 	};
 }
 
