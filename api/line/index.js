@@ -7,13 +7,14 @@ const lineConfig = {
 	channelSecret: env.CHANNEL_SECRET,
 };
 
-lineBot.post('/', (req, res) => {
+lineBot.post('/', async (req, res) => {
 	let bot = new Bot(req, res, lineConfig);
-	Promise.all(req.body.events.map(bot.handleIncomingEvents))
-		.then((result) => res.json(result))
-		.catch((error) => {
-			res.sendStatus(503).send(error)
-		});
+	try {
+		const result = await req.body.events.map(bot.handleIncomingEvents);
+		res.json(result);
+	} catch (error) {
+		res.sendStatus(503);
+	}
 });
 
 lineBot.get('/', (req, res) => res.json({ developers: ['Amos', 'Rex'] }));

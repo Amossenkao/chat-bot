@@ -8,7 +8,6 @@ async function database() {
 	} catch (error) {
 		console.log(error);
 	} finally {
-		client.close();
 		return users;
 	}
 }

@@ -34,6 +34,7 @@ class Bot {
 	fetchAiResponse = async (userName, userPrompt) => {
 		if (/delete/gi.test(userPrompt)) {
 			await users.clearUserConversations();
+			// await users.clearUsersList();
 			return 'past conversations has been deleted...';
 		}
 		await users.updateConversation(`${userName}: ${userPrompt.trim()}`);
@@ -66,7 +67,9 @@ class Bot {
 
 	//  Finally, this function calls all the other functions according to the logical flow
 	handleIncomingEvents = async (event) => {
-		if (event.type !== 'message' || event.message.type !== 'text') return null;
+		if (event.type !== 'message' || event.message.type !== 'text') {
+			return null;
+		}
 		const userPrompt = event.message.text?.toLowerCase();
 		try {
 			const userName = await this.getUserInfo(event);
