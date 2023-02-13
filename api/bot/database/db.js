@@ -1,15 +1,15 @@
 const { MongoClient } = require('mongodb');
 
+const client = new MongoClient(process.env.MONGO_DB_URI);
 async function database() {
-	const client = new MongoClient(process.env.MONGO_DB_URI);
 	try {
 		const database = client.db('chat-bot');
 		var users = database.collection('users');
+		return users;
 	} catch (error) {
 		console.log(error);
-	} finally {
-		return users;
+		return error;
 	}
 }
 
-module.exports = database;
+module.exports = { client, database };

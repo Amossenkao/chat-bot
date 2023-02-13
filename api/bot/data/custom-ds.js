@@ -1,4 +1,5 @@
 const { ObjectId } = require('mongodb');
+const { database } = require('../database/db');
 
 class ConversationStack {
 	constructor(conversation) {
@@ -50,7 +51,7 @@ class UsersList {
 		this.currentUserId = currentUserId;
 	}
 	async init() {
-		const collection = await require('../database/db')();
+		const collection = await database();
 		const usersObject = await collection.findOne();
 		if (!usersObject) collection.insertOne(this);
 		else {
@@ -89,7 +90,7 @@ class UsersList {
 	}
 
 	async updateDatabase() {
-		require('../database/db')().then((users) => {
+		await database().then((users) => {
 			users.findOneAndReplace(
 				{ _id: new ObjectId('63e8c2a158242da2b4e86f96') },
 				this
