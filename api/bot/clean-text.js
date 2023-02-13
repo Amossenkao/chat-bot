@@ -27,7 +27,7 @@ function cleanText(text, removeNumbers, removeSymbols, removeWords) {
 
 	//Remove numbers
 	if (removeNumbers) {
-		for (i = 0; i < stopWordsNumbers.length; i++) {
+		for (let i = 0; i < stopWordsNumbers.length; i++) {
 			var re = new RegExp('\\b' + stopWordsNumbers[i] + '\\b', 'gi');
 			text = text.replace(re, '');
 			text = text.replace(/[0-9]/gi, ' ').replace(/ \. /gi, ' ');
@@ -36,7 +36,7 @@ function cleanText(text, removeNumbers, removeSymbols, removeWords) {
 
 	//Remove words (very long list!)
 	if (removeWords) {
-		for (i = 0; i < stopWords.length; i++) {
+		for (let i = 0; i < stopWords.length; i++) {
 			var re = new RegExp('\\b' + stopWords[i] + '\\b', 'gi');
 			text = text.replace(re, '');
 		}
@@ -44,7 +44,7 @@ function cleanText(text, removeNumbers, removeSymbols, removeWords) {
 
 	//Remove symbols
 	if (removeSymbols) {
-		for (i = 0; i < stopWordsSymbols.length; i++) {
+		for (let i = 0; i < stopWordsSymbols.length; i++) {
 			var re = new RegExp('\\' + stopWordsSymbols[i], 'gi');
 			text = text.replace(re, '');
 		}

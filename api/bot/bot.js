@@ -23,6 +23,7 @@ class Bot {
 		try {
 			const profile = await this.lineClient.getProfile(userId);
 			await users.addUser(profile.displayName, userId);
+			console.log('Got user profile name: ', profile.displayName);
 			return profile.displayName;
 		} catch (error) {
 			console.log(error);

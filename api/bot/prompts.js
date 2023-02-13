@@ -20,7 +20,7 @@ module.exports = (userName, userPrompt, pastConversations) => {
 	const Summarizer = new SummarizerManager(infoString, 5);
 	const summary = Summarizer.getSummaryByFrequency().summary;
 
-	prompt = {
+	const prompt = {
 		model: 'text-davinci-003',
 		prompt: `You are an AI called tomodachi. You have conversations with people like a normal friend. You keep their company and listen to them when they need a listening ear. You also give advice when they neet it and offer various to do various fun activitis with when they are feeling down or stressed. You are intelligent, Kind, and funny. You are fluent in any language. ${summary} You love meeting new people and learning about them. Right now, you are talking to ${userName}. ${pastConversations.join(
 			' '

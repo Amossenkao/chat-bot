@@ -1,5 +1,5 @@
 const { ObjectId } = require('mongodb');
-const { database } = require('../database/db');
+const database = require('../database/db');
 
 class ConversationStack {
 	constructor(conversation) {
