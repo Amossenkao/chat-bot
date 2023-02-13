@@ -9,12 +9,13 @@ const lineConfig = {
 
 module.exports = async (req, res) => {
 	let bot = new Bot(req, res, lineConfig);
-	Promise.all(req.body.events.map(bot.handleIncomingEvents))
-		.then((response) => {
-			res.json(response);
-		})
-		.catch((error) => {
-			console.log(error);
-			res.sendStatus(503);
-		});
+	try {
+		const result = await req.body.events.map(bot.handleIncomingEvents);
+		console.log('Got result from the line/index.jsf file', result);
+		(await result) &&
+			Promise.all(result).then((response) => res.json(response));
+	} catch (error) {
+		console.log('Got error from the line/index.js file');
+		res.sendStatus(503);
+	}
 };
