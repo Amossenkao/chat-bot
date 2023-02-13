@@ -23,6 +23,7 @@ class Bot {
 		try {
 			const profile = await this.lineClient.getProfile(userId);
 			await users.addUser(profile.displayName, userId);
+			console.log('Got profile name:', profile.displayName);
 			return profile.displayName;
 		} catch (error) {
 			console.log(error);
@@ -34,7 +35,7 @@ class Bot {
 	fetchAiResponse = async (userName, userPrompt) => {
 		if (/delete/gi.test(userPrompt)) {
 			await users.clearUserConversations();
-			// await users.clearUsersList();
+			await users.clearUsersList();
 			return 'past conversations has been deleted...';
 		}
 		await users.updateConversation(`${userName}: ${userPrompt.trim()}`);
@@ -62,12 +63,14 @@ class Bot {
 			event.replyToken,
 			replyObject
 		);
+		console.log('Reply', reply);
 		return reply;
 	};
 
 	//  Finally, this function calls all the other functions according to the logical flow
 	handleIncomingEvents = async (event) => {
 		if (event.type !== 'message' || event.message.type !== 'text') {
+			console.log('Not message or empty text');
 			return null;
 		}
 		const userPrompt = event.message.text?.toLowerCase();
@@ -75,6 +78,7 @@ class Bot {
 			const userName = await this.getUserInfo(event);
 			const responseText = await this.fetchAiResponse(userName, userPrompt);
 			const output = await this.sendReply(event, userPrompt, responseText);
+			console.log('Output:', output);
 			return output;
 		} catch (error) {
 			return error;
